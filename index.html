@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editable Column Example</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 1px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        svg g text{
+            font-size:1.2em;
+            z-index: 10;
+        }
+
+        .parent {
+            display: flex;        /* Use Flexbox layout */
+            flex-direction: row;  /* Arrange child divs in a row (horizontally) */
+            flex-wrap: wrap;
+            justify-content: center; /* Center child divs horizontally */
+            align-items: center; /* Center child divs vertically */
+            gap: 50px;            /* Gap between child divs */
+        }
+
+        /* Styling for child divs */
+        .child {
+            margin: auto;
+            position: relative;
+            top: -30px;
+        }
+
+        .chart-cont {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+            margin-top: 20px;
+        }
+
+    </style>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+
+<table id="editable-table" style="width: 40%; position: relative; left: 30%;">
+    <tr>
+        <th>Nombre</th>
+        <th>Valor</th>
+        <th></th>
+    </tr>
+</table>
+
+<button id="my-button" style="left: 50%; position: relative;" >Actualizar</button>
+<div  class="parent" id="charts-container">
+</div>
+
+<script>
+
+    const printButton = document.getElementById('my-button');
+    const table = document.getElementById('editable-table');
+    const chartContainer = document.getElementById('charts-container');
+
+    const dataArray = [
+        { name: "Ventas 2023", value: 14599203944, goal: 30000000000 },
+        { name: "Facturado de Ventas 2022", value: 9820923721, goal: 12617824570 },
+        { name: "Facturado de Ventas 2023", value: 3883121613, goal:  15000000000 },
+        { name: "Saldo Total Facturado", value: 13729831530, goal:  27617824570 },
+        { name: "Adjudicado 2023 para facturar 2024", value: 3484192265, goal:  15000000000 },
+        { name: "Cotizaciones 2023", value: 100305061444, goal: 150000000000 },
+
+        { name: "Ventas Suministros 2023" , value: 6110249168 , goal: 15340000000 },
+        { name: "Ventas servicios 2023" , value:  8488954776 , goal: 14660000000 },
+        { name: "Venta Suministros Varios 2023" , value: 1227640213 , goal: 6840000000 },
+        { name: "Ventas Servicios Lufkin 2023" , value: 123466734 , goal: 500000000 },
+        { name: "Ventas Suministros Lufkin 2023" , value: 4882608955 , goal: 8500000000 },
+
+        { name: "Ventas Servicios APC 2023", value: 3930616696, goal: 3688000000},
+        { name: "Ventas Servicios AIC 2023", value: 4247111356 , goal: 7452000000 },
+        { name: "Ventas Servicios Seguridad Técnica 2023", value: 187759990, goal: 750000000 },
+        { name: "Ventas Servicios Ciberseguridad 2023", value: 0 , goal: 1500000000 },
+        { name: "Ventas Servicios Mindsphere 2023", value: 0 , goal: 420000000 },
+        { name: "Ventas Servicios Analítica de Datos 2023", value: 0 , goal: 250000000},
+        { name: "Ventas Servicios Realidad Mixta 2023", value: 0 , goal: 100000000 },
+        
+        { name: "Ventas Servicios  Ecopetrol 2023", value: 5198672648, goal: 5198672648 },
+        { name: "Ventas Suministros Ecopetrol 2023", value: 5121313263, goal: 8730000000 },
+        { name: "Ventas Servicios SierraCol 2023", value: 1777623097, goal: 2115000000 },
+        { name: "Ventas Suministros SierraCol 2023", value: 659375331, goal: 4090000000 },
+        { name: "Ventas Servicios West Advanced 2023", value: 1061298306, goal: 2000000000 },
+        { name: "Ventas Suministros Petrosantander 2023", value: 106276587, goal: 120399838 },
+        { name: "Ventas Servicios Otros 2023", value: 528720110, goal: 4187739957 },
+        { name: "Ventas Suministros Otros 2023", value: 252201189, goal: 2399600162 }
+    ];
+
+
+    function insertRows(dataArray) {
+        var table = document.getElementById("editable-table"); // Replace with your actual table ID
+        for (var i = 0; i < dataArray.length; i++) {
+            var row = document.createElement("tr");
+
+            var nameCell = document.createElement("td");
+            var nameInput = document.createElement("input");
+            nameInput.type = "text";
+            nameInput.className = "name-input";
+            nameInput.value = dataArray[i].name; // Assuming your object has a 'name' property
+            nameCell.appendChild(nameInput);
+
+            var goalCell = document.createElement("td");
+            var goalInput = document.createElement("input");
+            goalInput.type = "text";
+            goalInput.className = "goal-input";
+            goalInput.value = dataArray[i].goal; // Assuming your object has a 'goal' property
+            goalCell.appendChild(goalInput);
+
+            var valueCell = document.createElement("td");
+            var valueInput = document.createElement("input");
+            valueInput.type = "text";
+            valueInput.className = "value-input";
+            valueInput.value = dataArray[i].value; // Assuming your object has a 'value' property
+            valueCell.appendChild(valueInput);
+
+            row.appendChild(nameCell);
+            row.appendChild(goalCell);
+            row.appendChild(valueCell);
+
+            table.appendChild(row);
+
+            const chartObject = document.createElement('div');
+            chartObject.classList.add("chart-cont");
+            const chartInstance = chartContainer.appendChild(chartObject);
+
+            const title = document.createElement('h3');
+            title.innerText = dataArray[i].name;
+            chartInstance.appendChild(title);
+            
+            const chartDiv = document.createElement('div');
+            chartDiv.id = 'chart_div_' + i;
+            chartDiv.classList.add("child");
+            const element = chartInstance.appendChild(chartDiv);
+        }
+        console.log("Creating gauges");
+        CreateGauges();
+    }
+    insertRows(dataArray);
+
+
+    printButton.addEventListener('click', function() {
+        CreateGauges();
+    });
+
+    function CreateGauges()
+    {
+        const rows = table.querySelectorAll('tr');
+        rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('td input');
+            const rowData = [];
+            cells.forEach(cell => {
+                rowData.push(cell.value);
+            });
+
+            if(rowIndex>0)
+            {
+                const element = document.getElementById("chart_div_"+(rowIndex-1));
+                console.log(rowData);
+                const goal = parseInt(rowData[1]);
+                const value = parseInt(rowData[2]);
+                const percent = value/goal;
+
+                google.charts.load('current', {
+                packages: ['gauge']
+                }).then(() => renderGaugeChart(element,formatPercent(percent),goal,value));
+            }
+        });
+    }
+
+    function formatNumber(number) {
+        const formatter = new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            notation: 'compact'
+        });
+        return formatter.format(number);
+    }
+
+    function formatPercent(number) {
+        return (number * 100).toFixed(2) + "%";
+    }
+
+    function renderGaugeChart(id, name, goal, value)
+    {
+        var data = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        [name, value],
+        ]);
+        var options = {
+        width: 800, height: 320,//400,120
+        redFrom: 0, redTo: goal*0.8,
+        yellowFrom:goal*0.8, yellowTo: goal,
+        greenFrom:goal, greenTo:goal*1.2,
+        minorTicks: 4,
+        majorTicks: ['0','','','','',formatNumber(goal), ''],
+        min: 0,
+        max: goal*1.2
+        };
+    
+        var chart = new google.visualization.Gauge(id);
+    
+        var formatnumbers = new google.visualization.NumberFormat({
+            prefix: '$',  // Set the prefix for the currency symbol
+            fractionDigits: 0,
+            groupingSymbol: ',',  // Set the thousands separator
+            negativeParens: true, // Show negative numbers in parentheses
+            negativeColor: 'red' // Set the color for negative numbers
+        });
+
+        formatnumbers.format(data, 1); // Format the numbers in the second column (column index 1)
+        chart.draw(data, options);
+    }
+
+    var button = document.getElementById('myButton');
+
+</script>
+
+</body>
+</html>
