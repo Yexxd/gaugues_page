@@ -50,7 +50,7 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
-
+<h1 id="num1">Hola</h1>
 <table id="editable-table" style="width: 40%; position: relative; left: 30%;">
     <tr>
         <th>Nombre</th>
@@ -156,9 +156,12 @@
     printButton.addEventListener('click', function() {
         CreateGauges();
     });
-
+    var num1 = 0;
     function CreateGauges()
     {
+        cont n1 = document.getElementById("num1");
+        n1.innerText = num1;
+        num1 += 1;
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, rowIndex) => {
             const cells = row.querySelectorAll('td input');
